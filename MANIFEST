@@ -1,0 +1,7 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+lib/Math/BinPacking.pm
+t/Math_BinPacking.t
