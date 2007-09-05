@@ -307,12 +307,17 @@ Created: 10 Apr 2007
 
 =head1 COPYRIGHT
 
-Copyright (c) 2007 Dean Serenevy. All rights reserved.
-This program is free software; you can redistribute
-it and/or modify it under the same terms as Perl itself.
+This software is hereby placed into the public domain. If you use this
+code, a simple comment in your code giving credit and an email letting
+me know that you find it useful would be courteous but is not required.
 
-The full text of the license can be found in the
-LICENSE file included with this module.
+The software is provided "as is" without warranty of any kind, either
+expressed or implied including, but not limited to, the implied warranties
+of merchantability and fitness for a particular purpose. In no event shall
+the authors or copyright holders be liable for any claim, damages or other
+liability, whether in an action of contract, tort or otherwise, arising
+from, out of or in connection with the software or the use or other
+dealings in the software.
 
 =head1 SEE ALSO
 
