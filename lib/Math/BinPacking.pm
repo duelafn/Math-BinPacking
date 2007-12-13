@@ -31,53 +31,6 @@ sub rsortitems { map $$_[1], sort { $$b[0] <=> $$a[0] } map [item_size($_), $_],
 sub ceil($) { my $x = shift; return ($x == int $x) ? $x : ($x > 0) ? int( $x+1 ) : int($x) }
 
 
-# Note: randomizing is rarely useful, decreasing is frequently useful
-sub pack_items {
-  my ($size, $items, $randomizations, $tried_decreasing) = @_;
-
-  # Simplistic lower-bounds:
-  #  1) # bins >= total size to pack / bin size
-  #  2) # bins >= number of items filling more than half a bin
-  #     a) can extend this slightly by adding .5 bins each time an item
-  #        with size = 1/2 bin size is encountered.
-  my ($min_bins, $total_size, $half_size) = (0,0,$size/2);
-  for (@$items) {
-    my $s = item_size($_);
-
-    if    ($s  < $half_size) { 1; }# The common case
-    elsif ($s  > $half_size) { $min_bins++ }
-    elsif ($s == $half_size) { $min_bins += .5 }
-
-    $total_size += $s;
-  }
-  $min_bins = ceil max( $min_bins, $total_size / $size );
-  $randomizations ||= 0;
-
-  my (@bins, @best, $i);
- BP_LOOP:
-  for $i (0..$randomizations) {
-    for (\&pack_next_fit, \&pack_first_fit, \&pack_worst_fit, \&pack_best_fit) {
-      @bins = &$_($size, $items);
-      @best = @bins if !@best or @best > @bins;
-      last BP_LOOP  if @best == $min_bins;
-    }
-
-    if (!$tried_decreasing) {
-      $tried_decreasing = 1;
-      my @ritems = rsortitems $items;
-      for (\&pack_next_fit, \&pack_first_fit, \&pack_worst_fit, \&pack_best_fit) {
-        @bins = &$_($size, \@ritems);
-        @best = @bins if !@best or @best > @bins;
-        last BP_LOOP  if @best == $min_bins;
-      }
-    }
-  } continue {
-    @$items = shuffle(@$items) if $i < $randomizations;
-  }
-
-  return @best;
-}
-
 =pod
 
 =head1 NAME
@@ -241,6 +194,74 @@ sub pack_next_fit {
 =head2 :util
 
 =cut
+
+=head3 pack_items
+
+ @bins = pack_items( $bin_size, \@items, $max_nr_randomizations, $skip_decreasing )
+
+Try all algorithms, attempting to pack items into minimal number of bins.
+Item list will be randomized (alters the C<@items> list) if
+C<$max_nr_randomizations> and greater than zero. The "decreasing"
+algorithms will not be attempted if C<$skip_decreasing> is true.
+
+ # Return first minimal packing of NF, FF, WF, BF, NFD, FFD, WFD, BFD (no randomizations)
+ @bins = pack_items( $bin_size, \@items )
+
+ # Return first minimal packing of NF, FF, WF, BF, NFD, FFD, WFD, BFD,
+ # or NF, FF, WF, BF applied to (up to) two randomizations of C<@items>.
+ @bins = pack_items( $bin_size, \@items, 2 )
+
+ # Return first minimal packing of NF, FF, WF, BF (Note: order never altered)
+ @bins = pack_items( $bin_size, \@items, 0, 1 )
+
+=cut
+
+# Note: randomizing is rarely useful, decreasing is frequently useful
+sub pack_items {
+  my ($size, $items, $randomizations, $tried_decreasing) = @_;
+
+  # Simplistic lower-bounds:
+  #  1) # bins >= total size to pack / bin size
+  #  2) # bins >= number of items filling more than half a bin
+  #     a) can extend this slightly by adding .5 bins each time an item
+  #        with size = 1/2 bin size is encountered.
+  my ($min_bins, $total_size, $half_size) = (0,0,$size/2);
+  for (@$items) {
+    my $s = item_size($_);
+
+    if    ($s  < $half_size) { 1; }# The common case
+    elsif ($s  > $half_size) { $min_bins++ }
+    elsif ($s == $half_size) { $min_bins += .5 }
+
+    $total_size += $s;
+  }
+  $min_bins = ceil max( $min_bins, $total_size / $size );
+  $randomizations ||= 0;
+
+  my (@bins, @best, $i);
+ BP_LOOP:
+  for $i (0..$randomizations) {
+    for (\&pack_next_fit, \&pack_first_fit, \&pack_worst_fit, \&pack_best_fit) {
+      @bins = &$_($size, $items);
+      @best = @bins if !@best or @best > @bins;
+      last BP_LOOP  if @best == $min_bins;
+    }
+
+    if (!$tried_decreasing) {
+      $tried_decreasing = 1;
+      my @ritems = rsortitems $items;
+      for (\&pack_next_fit, \&pack_first_fit, \&pack_worst_fit, \&pack_best_fit) {
+        @bins = &$_($size, \@ritems);
+        @best = @bins if !@best or @best > @bins;
+        last BP_LOOP  if @best == $min_bins;
+      }
+    }
+  } continue {
+    @$items = shuffle(@$items) if $i < $randomizations;
+  }
+
+  return @best;
+}
 
 sub print_bins  { print sprint_bins(@_) }
 sub sprint_bins { join "\n", sprintf("BINS: %d", 0+@_), map(sprint_bin($_), @_), ""; }
