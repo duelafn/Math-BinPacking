@@ -1,6 +1,5 @@
 package Math::BinPacking;
 use Carp; use strict; use warnings;
-# SVN $Id$
 our $VERSION = 0.1;
 
 require Exporter;
@@ -319,6 +318,10 @@ sub ctext {
 
 __END__
 Created: 10 Apr 2007
+
+=head1 SEE ALSO
+
+ Algorithm::BinPack
 
 =head1 AUTHOR
 
