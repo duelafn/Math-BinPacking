@@ -326,7 +326,7 @@ Created: 10 Apr 2007
 =head1 AUTHOR
 
  Dean Serenevy
- dean@cs.serenevy.net
+ dean@serenevy.net
  http://dean.serenevy.net/
 
 =head1 COPYRIGHT
