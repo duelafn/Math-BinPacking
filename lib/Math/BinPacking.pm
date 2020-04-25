@@ -62,6 +62,16 @@ Math::BinPacking - Several simple bin packing algorithms
 
  @bins = pack_first_fit $size, \@items;
 
+
+Note: We have tight bounds for FFD() num bins from first-fit-decreasing and
+OPT() num bins optimal of:
+
+   FFD(L) ≤ 11/9 ⋅ OPT(L) + 6/9
+
+Dósa, György and Li, Rongheng and Han, Xin and Tuza, Zsolt, "Tight absolute
+bound for First Fit Decreasing bin-packing: FFD(L) ≤ 11/9 OPT(L) + 6/9",
+Theoretical Computer Science Volume 510, 28 October 2013, Pages 13-61
+
 =cut
 
 sub pack_first_fit_decreasing {
